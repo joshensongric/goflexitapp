@@ -1,11 +1,149 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <script src="script.js"></script>
-    <!-- <link rel="stylesheet" type="text/css" href="styles.css"> -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Flex Verify</title>
+    <script src="https://sandbox.weavr.io/app/secure/static/client.1.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://code.jquery.com/jquery-3.7.0.min.js"
+      integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      form {
+        border: 0px solid #101111;
+        border-radius: 8px;
+        padding: 24px;
+      }
+      /* Rest of the CSS styles */
+    </style>
+    <style>
+      input[type='submit'] {
+        background-color: #16cb79;
+        color: #fff;
+        padding: 10px 20px;
+        font-family: 'Quicksand', sans-serif;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        width: 100%;
+        cursor: pointer;
+        height: 50px; /* Set your desired fixed height value here */
+      }
+    </style>
+    <style>
+      .border {
+        border-radius: 12px;
+        border: 2px solid #eaeef2;
+      }
+    </style>
+    <style>
+      h2 {
+        font-family: 'Quicksand';
+        color: #95a1ac;
+        font-size: 32px;
+        font-weight: 500;
+        text-align: left;
+      }
+    </style>
   </head>
   <body>
-    <h1>Hello there!</h1>
-    <a href="/me.html">My other page</a>
+    <div id="successMessage" style="display: none">
+      <h2 id="success">Checking...</h2>
+    </div>
+
+    <div id="hide">
+      <form onSubmit="onSubmit(); return false;">
+        <div class="border">
+          <div id="passcode"></div>
+        </div>
+        <br />
+        <input type="submit" value="Confirm" />
+      </form>
+    </div>
+    <script type="text/javascript">
+      const params = new URLSearchParams(window.location.search);
+
+      const rid = params.get('rid') || '';
+      const wid = params.get('wid') || '';
+      const uid = params.get('uid') || '';
+      const tid = params.get('tid') || '';
+
+      window.OpcUxSecureClient.init('08lh8V0130QBegcKUo0ADQ==', {
+        fonts: [
+          {
+            cssSrc:
+              'https://fonts.googleapis.com/css2?family=Quicksand:wght@600',
+          },
+        ],
+      });
+
+      var form = window.OpcUxSecureClient.form();
+      var input = form.input('passcode', 'passCode', {
+        placeholder: '',
+        style: {
+          base: {
+            textAlign: 'center',
+            letterSpacing: '16px',
+            lineHeight: 1.5,
+            fontFamily: 'Quicksand',
+            fontSize: '32px',
+            fontStyle: 'Bold',
+            color: '#1D2429',
+            ':hover': { color: '#16CB79' },
+            ':focus': { color: '#16CB79' },
+          },
+          empty: { color: '#57636C' },
+          valid: { color: '#16CB79' },
+          invalid: { color: '#E21C3D' },
+        },
+      });
+
+      // Define this input so that the 'enter key' would submit the passcode input
+      input.on('submit', () => {});
+
+      // Embed the secure Passcode component in the HTML element where you want
+      // the Passcode component to the shown on screen
+      input.mount(document.getElementById('passcode'));
+
+      function onSubmit() {
+        form.tokenize(function (tokens) {
+          console.log(tokens);
+          const passcode = tokens.passcode;
+          console.log(passcode);
+
+          $.post(
+            'https://rowy-hooks-ffcyzafkna-nw.a.run.app/wh/weavr_tokens/KIpOEURSx3HGMZuFey9B',
+            {
+              token: passcode,
+              uid: uid,
+              weavr_id: wid,
+              request_id: rid,
+              type: tid,
+            }
+          ).done(function (data) {
+            const isDone = console.log(data);
+
+            if (data === 'OK') {
+              document.getElementById('hide').style.display = 'none';
+              document.getElementById('successMessage').style.display = 'block';
+            }
+          });
+          // Notify Dart side
+          if (window.flutter_inappwebview) {
+            window.flutter_inappwebview.callHandler(
+              'passcodeHandler',
+              passcode
+            );
+          }
+        });
+      }
+    </script>
   </body>
-</html> 
+</html>
